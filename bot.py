@@ -22,7 +22,7 @@ load_dotenv()
 
 TELEGRAM_TOKEN  = os.getenv("TELEGRAM_TOKEN")
 ANTHROPIC_KEY   = os.getenv("ANTHROPIC_API_KEY")
-ALLOWED_USER_ID = os.getenv("ALLOWED_USER_ID")   # tu Telegram user ID (opcional pero recomendado)
+ALLOWED_USER_IDS = set(os.getenv("ALLOWED_USER_ID", "").split(",")) - {""}  # IDs separados por coma
 
 MODEL     = "claude-sonnet-4-6"
 MAX_TOKENS = 4096
@@ -46,10 +46,10 @@ conversation_history: dict[int, list] = {}
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 def is_allowed(update: Update) -> bool:
-    """Si ALLOWED_USER_ID está definido, solo ese usuario puede usar el bot."""
-    if not ALLOWED_USER_ID:
+    """Si ALLOWED_USER_IDS está definido, solo esos usuarios pueden usar el bot."""
+    if not ALLOWED_USER_IDS:
         return True
-    return str(update.effective_user.id) == ALLOWED_USER_ID
+    return str(update.effective_user.id) in ALLOWED_USER_IDS
 
 
 async def send_typing(update: Update):
